@@ -2,7 +2,7 @@ action :run do
 	begin
 		database = @new_resource.database
 		instance = @new_resource.instance
-		mssqlserver_sqlcommand 'truncate transaction log' do
+		mssqlserver_sql_command 'truncate transaction log' do
 			command <<-EOH
 				IF (EXISTS (SELECT name 
 				FROM master.dbo.sysdatabases 
