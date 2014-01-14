@@ -1,8 +1,8 @@
 require 'pathname'
 
 action :unzip do
-	filepath = @new_resource.archivepath
-	backuppath = @new_resource.backuppath
+	filepath = @new_resource.archive_path
+	backuppath = @new_resource.backup_path
 	
 	if filepath.end_with?('.zip')
 		cache_dir = "#{Chef::Config[:file_cache_path]}/database"

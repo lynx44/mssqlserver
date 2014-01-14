@@ -5,10 +5,6 @@ action :run do
     timeout = @new_resource.timeout
     args = Hash.new
 
-    if @new_resource.server != nil
-      args['-S'] = @new_resource.server
-    end
-
     if @new_resource.username != nil
       args['-U'] = @new_resource.username
     end

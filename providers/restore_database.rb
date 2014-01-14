@@ -2,11 +2,12 @@ require 'pathname'
 include Windows::Helper
 
 action :run do
-	filepath = unzip(@new_resource.filepath)
+	filepath = unzip(@new_resource.file_path)
 	filepath = win_friendly_path(filepath)
 	database = @new_resource.database
 	datadirectory = @new_resource.data_directory
 	instance = @new_resource.instance
+  timeout = @new_resource.timeout
   withOptions = @new_resource.with == nil ? "RECOVERY" : @new_resource.with.join(",")
 	Chef::Log.info("Restoring database #{database} from #{filepath}")
 	command = <<-EOH
@@ -118,9 +119,10 @@ action :run do
 	EOH
 		
 	Chef::Log.debug("#{command}")
-	mssqlserver_sqlcommand 'restoredatabase' do
+	mssqlserver_sql_command 'restoredatabase' do
 		command "#{command}"
 		instance instance
+    timeout timeout
 		action :run
 	end
 end

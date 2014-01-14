@@ -18,23 +18,17 @@ action :run do
 		  args['/TargetDatabaseName'] = @new_resource.database
 		end
 		
-		if @new_resource.dacpacpath != nil
-		  args['/SourceFile'] = @new_resource.dacpacpath
+		if @new_resource.dacpac_path != nil
+		  args['/SourceFile'] = @new_resource.dacpac_path
 		end
 		
-		if @new_resource.sqlaction != nil
-		  args['/Action'] = @new_resource.sqlaction
+		if @new_resource.sql_action != nil
+		  args['/Action'] = @new_resource.sql_action
 		end
 		
 		if @new_resource.variables != nil
 		  args['/Variables'] = @new_resource.variables.map{|k,v| "#{k}=#{v}"}.join(';')
 		end
-		
-=begin		
-		if @new_resource.instance != nil
-		  args['-S'] = @new_resource.instance
-		end
-=end
 		
 		cmdargs = args.map{|k,v| "#{k}:\"#{v}\""}.join(' ')
 		Chef::Log.info("Args #{cmdargs}")
