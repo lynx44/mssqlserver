@@ -1,0 +1,1 @@
+default['mssqlserver']['sqlcmdpath'] = 'C:\\Program Files\\Microsoft SQL Server\\110\\Tools\\Binn\\sqlcmd.exe'
