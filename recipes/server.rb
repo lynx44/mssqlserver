@@ -45,7 +45,7 @@ windows_package node['mssqlserver']['server']['package_name'] do
   action :install
 end
 
-mssqlserver_sqlcommand "add builtin/administrators" do
+mssqlserver_sql_command "add builtin/administrators" do
   command <<-EOH
     IF NOT EXISTS(SELECT * FROM syslogins WHERE [name] = 'BUILTIN\\Administrators')
     BEGIN
