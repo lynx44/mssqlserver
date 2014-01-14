@@ -1,68 +1,59 @@
 mssqlserver Cookbook
 ====================
-TODO: Enter the cookbook description here.
-
-e.g.
-This cookbook makes your favorite breakfast sandwhich.
+This cookbook provides some common functionality for Sql Server. This is currently a very early release, everything is a work in progress.
 
 Requirements
 ------------
-TODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.
+windows
+powershell
+dotnetframework
+windows_firewall
 
-e.g.
-#### packages
-- `toaster` - mssqlserver needs toaster to brown your bagel.
-
-Attributes
+Recipes
 ----------
-TODO: List you cookbook attributes here.
+#### mssqlserver::firewall
 
-e.g.
-#### mssqlserver::default
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td><tt>['mssqlserver']['bacon']</tt></td>
-    <td>Boolean</td>
-    <td>whether to include bacon</td>
-    <td><tt>true</tt></td>
-  </tr>
-</table>
+Opens the default firewall port.
 
-Usage
------
-#### mssqlserver::default
-TODO: Write usage instructions for each cookbook.
+#### mssqlserver::restore_database
 
-e.g.
-Just include `mssqlserver` in your node's `run_list`:
+Restores a database.
 
-```json
-{
-  "name":"my_node",
-  "run_list": [
-    "recipe[mssqlserver]"
-  ]
-}
-```
+    # uri (url or local file path) to backup file. Can be a .bak. bkf, or .zip file.
+    default['mssqlserver']['restore']['filepath'] = 'c:\backup.bak'
 
-Contributing
-------------
-TODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.
+    # folder where database should reside
+    default['mssqlserver']['restore']['data_directory'] = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA'
 
-e.g.
-1. Fork the repository on Github
-2. Create a named feature branch (like `add_component_x`)
-3. Write you change
-4. Write tests for your change (if applicable)
-5. Run the tests, ensuring they all pass
-6. Submit a Pull Request using Github
+    # database name
+    default['mssqlserver']['restore']['database']
 
-License and Authors
--------------------
-Authors: TODO: List authors
+    # username with permissions to restore a database
+    default['mssqlserver']['restore']['username']
+
+    # password for the above user
+    default['mssqlserver']['restore']['password']
+
+    # instance. by default this is localhost. for sqlexpress, you may want to use localhost\SQLEXPRESS
+    default['mssqlserver']['restore']['instance']
+
+    # array of WITH options for restore. options are typically 'recovery' or 'norecovery'
+    default['mssqlserver']['restore']['with']
+
+#### mssqlserver::server
+
+Configures Sql Server 2012.
+
+This recipe will only work under the following conditions:
+
+- .NET Framework 4.0 is installed on the machine
+
+- If chef-client is run remotely, it must be run using winrs with the -ad option.
+- \[remote machine\] winrm set winrm/config/client/auth @{CredSSP="true"}
+- \[client machine\] winrm set winrm/config/client/auth @{CredSSP="true"}
+- \[client machine\] Enable AllowFreshCredentials:
+- Local Computer Policy -> Computer Configuration -> Administrative Templates -> System -> Credentials Delegation
+- Enable each of the "Allow Delegating [...] Credentials" permissions. For each, click on "Show" and add WSMAN/*.your.domain.com (or WSMAN/* for any servers)
+
+- Example remote command:
+   + winrs -r:http://myserver:5985 -ad -u:Administrator chef-client -o "recipe[mssqlserver::server]"

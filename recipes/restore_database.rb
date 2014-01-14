@@ -1,6 +1,6 @@
 mssqlserver_restoredatabase "restore sql database" do
   filepath  node['mssqlserver']['restore']['filepath']
-  server    node['mssqlserver']['restore']['server']
+  #server    node['mssqlserver']['restore']['server']
   username  node['mssqlserver']['restore']['username']
   password  node['mssqlserver']['restore']['password']
   database  node['mssqlserver']['restore']['database']
