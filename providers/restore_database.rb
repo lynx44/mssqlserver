@@ -147,9 +147,9 @@ def unzip(filepath)
 	if(archivepath.end_with?(".zip"))
 		backupname = "#{Pathname.new(filepath).basename}".gsub('zip', 'bak')
 		backuppath = "#{cache_dir}/#{backupname}"
-		mssqlserver_unzipdatabase "unzip database" do
-			archivepath archivepath
-			backuppath backuppath
+		mssqlserver_unzip_database "unzip database" do
+			archive_path archivepath
+			backup_path backuppath
 			action :unzip
 		end
 	end
