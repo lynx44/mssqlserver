@@ -40,7 +40,7 @@ windows_package node['mssqlserver']['server']['package_name'] do
   source source
   checksum checksum
   installer_type :custom
-  timeout 9000
+  timeout 72000
   options "/ConfigurationFile=#{config_file_path}"
   action :install
 end
