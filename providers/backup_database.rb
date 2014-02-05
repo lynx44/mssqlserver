@@ -6,6 +6,12 @@ action :run do
 end
 
 def build_command
-  @command ||= "BACKUP DATABASE [#{@new_resource.database}] TO  DISK = N'#{@new_resource.destination}' WITH NOFORMAT, INIT,  NAME = N'#{@new_resource.database}-Full Database Backup', SKIP, NOREWIND, NOUNLOAD,  STATS = 10
+  @command ||= "BACKUP DATABASE [#{@new_resource.database}] TO  DISK = N'#{@new_resource.destination}' WITH #{with_options}
     GO"
+end
+
+def with_options
+  options = @new_resource.with || ['NOFORMAT', 'INIT', 'SKIP', 'NOREWIND', 'NOUNLOAD', 'STATS = 10']
+  options = ["NAME = N'#{@new_resource.database}-Full Database Backup'"].concat(options)
+  options.join(', ')
 end
