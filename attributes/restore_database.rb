@@ -6,3 +6,4 @@ default['mssqlserver']['restore']['username'] = nil
 default['mssqlserver']['restore']['password'] = nil
 default['mssqlserver']['restore']['instance'] = 'localhost'
 default['mssqlserver']['restore']['with'] = nil
+default['mssqlserver']['restore']['drop'] = false
