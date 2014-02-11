@@ -127,6 +127,17 @@ action :run do
 	end
 end
 
+action :drop do
+  database = @new_resource.database
+  instance = @new_resource.instance
+  mssqlserver_sql_command "drop database #{database}" do
+    command "DROP DATABASE [#{database}]"
+    instance instance
+    database 'master'
+    action :run
+  end
+end
+
 private
 def unzip(filepath)
 	cache_dir = "#{Chef::Config[:file_cache_path]}/database"

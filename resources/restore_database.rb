@@ -1,4 +1,5 @@
-actions :run
+actions :run, :drop
+default_action :run
 
 attribute :file_path, :kind_of => String
 attribute :server, :kind_of => String
@@ -9,8 +10,3 @@ attribute :instance, :kind_of => String #the sql instance to connect to (such as
 attribute :data_directory, :kind_of => String #the directory to restore the files to (optional)
 attribute :with, :kind_of => Array
 attribute :timeout, :kind_of => Integer
-
-def initialize(*args)
-  super
-  @action = :run
-end
