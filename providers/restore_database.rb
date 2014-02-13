@@ -5,7 +5,9 @@ action :run do
 	filepath = unzip(@new_resource.file_path)
 	filepath = win_friendly_path(filepath)
 	database = @new_resource.database
-	datadirectory = @new_resource.data_directory
+	data_directory = @new_resource.data_directory
+  log_directory = @new_resource.log_directory
+  ignore_logs = @new_resource.ignore_logs
 	instance = @new_resource.instance
   timeout = @new_resource.timeout
   withOptions = @new_resource.with == nil ? "RECOVERY" : @new_resource.with.join(",")
@@ -20,7 +22,10 @@ action :run do
 		SET @DatabaseName = N'#{database}';
 		
 		DECLARE @DataDirectory AS NVARCHAR(MAX)
-		SET @DataDirectory = '#{datadirectory}'
+		SET @DataDirectory = '#{data_directory}'
+
+    DECLARE @LogDirectory AS NVARCHAR(MAX)
+		SET @LogDirectory = '#{log_directory}'
 		
 		DECLARE @LogicalDataName AS NVARCHAR(MAX)
 		DECLARE @LogicalLogName AS NVARCHAR(MAX)
@@ -65,7 +70,15 @@ action :run do
 		--if a specific directory was specified, set the log paths to move to that directory
 		IF(@DataDirectory != '')
 		BEGIN
+      --map all files (including logs) to the data directory if specified
 			UPDATE #filelist SET PhysicalName = @DataDirectory + SUBSTRING(PhysicalName, LEN(PhysicalName) - CHARINDEX('\\', REVERSE(PhysicalName)) + 1, CHARINDEX('\\', REVERSE(PhysicalName)) + 1)
+		END
+
+    IF(@LogDirectory != '')
+		BEGIN
+      --map the log files to the specified directory
+			UPDATE #filelist SET PhysicalName = @LogDirectory + SUBSTRING(PhysicalName, LEN(PhysicalName) - CHARINDEX('\\', REVERSE(PhysicalName)) + 1, CHARINDEX('\\', REVERSE(PhysicalName)) + 1)
+      WHERE [Type]='L'
 		END
 		
 		SELECT * FROM #filelist

@@ -9,5 +9,6 @@ mssqlserver_restore_database 'restore sql database' do
   instance  node['mssqlserver']['restore']['instance']
   with      node['mssqlserver']['restore']['with']
   data_directory node['mssqlserver']['restore']['data_directory']
+  log_directory node['mssqlserver']['restore']['log_directory']
   action actions
 end
