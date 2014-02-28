@@ -2,17 +2,47 @@ require 'pathname'
 include Windows::Helper
 
 action :run do
-	filepath = unzip(@new_resource.file_path)
-	filepath = win_friendly_path(filepath)
-	database = @new_resource.database
-	data_directory = @new_resource.data_directory
+  sql_command = create_script_contents
+	Chef::Log.debug("#{command}")
+	mssqlserver_sql_command 'restoredatabase' do
+		command sql_command
+		instance instance
+    timeout timeout
+		action :run
+	end
+end
+
+action :drop do
+  database = @new_resource.database
+  instance = @new_resource.instance
+  mssqlserver_sql_command "drop database #{database}" do
+    command "DROP DATABASE [#{database}]"
+    instance instance
+    database 'master'
+    action :run
+  end
+end
+
+action :script do
+  script_path = @new_resource.script_path
+  command = create_script_contents
+  file script_path do
+    content create_script_contents
+  end
+end
+
+def create_script_contents
+  filepath = unzip(@new_resource.file_path)
+  filepath = win_friendly_path(filepath)
+  database = @new_resource.database
+  data_directory = @new_resource.data_directory
   log_directory = @new_resource.log_directory
   ignore_logs = @new_resource.ignore_logs
-	instance = @new_resource.instance
+  instance = @new_resource.instance
   timeout = @new_resource.timeout
   withOptions = @new_resource.with == nil ? "RECOVERY" : @new_resource.with.join(",")
-	Chef::Log.info("Restoring database #{database} from #{filepath}")
-	command = <<-EOH
+  Chef::Log.info("Restoring database #{database} from #{filepath}")
+  command = <<-EOH
 		USE MASTER
 
 		DECLARE @Path AS NVARCHAR(MAX);
@@ -20,20 +50,20 @@ action :run do
 
 		DECLARE @DatabaseName AS NVARCHAR(MAX);
 		SET @DatabaseName = N'#{database}';
-		
+
 		DECLARE @DataDirectory AS NVARCHAR(MAX)
 		SET @DataDirectory = '#{data_directory}'
 
     DECLARE @LogDirectory AS NVARCHAR(MAX)
 		SET @LogDirectory = '#{log_directory}'
-		
+
 		DECLARE @LogicalDataName AS NVARCHAR(MAX)
 		DECLARE @LogicalLogName AS NVARCHAR(MAX)
 
 		/* get the file list from the current backup */
 		IF OBJECT_ID('tempdb..#filelist') IS NOT NULL
 			DROP TABLE #filelist
-			
+
 		CREATE TABLE #filelist(
 		LogicalName NVARCHAR(MAX),
 		PhysicalName NVARCHAR(MAX),
@@ -57,7 +87,7 @@ action :run do
 		IsPresent BIT,
 		TDEThumbprint NVARCHAR(MAX))
 
-		INSERT #filelist 
+		INSERT #filelist
 		EXECUTE sp_executesql N'RESTORE FILELISTONLY
 		FROM DISK=@Path', N'@Path NVARCHAR(MAX)', @Path=@Path
 
@@ -80,7 +110,7 @@ action :run do
 			UPDATE #filelist SET PhysicalName = @LogDirectory + SUBSTRING(PhysicalName, LEN(PhysicalName) - CHARINDEX('\\', REVERSE(PhysicalName)) + 1, CHARINDEX('\\', REVERSE(PhysicalName)) + 1)
       WHERE [Type]='L'
 		END
-		
+
 		SELECT * FROM #filelist
 
 		/* end get the file list from the live database */
@@ -100,22 +130,22 @@ action :run do
 		DECLARE @RestoreDatabaseCommand NVARCHAR(MAX);
 		DECLARE @RestoreDatabaseParams NVARCHAR(MAX);
 		SET @RestoreDatabaseParams = N'@Path NVARCHAR(MAX)';
-			
+
 		SET @RestoreDatabaseCommand = N'RESTORE DATABASE ' + @DatabaseName + N' FROM DISK=@Path ';
-		
+
 		BEGIN
-			SET @RestoreDatabaseParams = @RestoreDatabaseParams + 
+			SET @RestoreDatabaseParams = @RestoreDatabaseParams +
 			N', @LogicalDataName NVARCHAR(MAX), @LogicalLogName NVARCHAR(MAX)';
-			
+
 			DECLARE @MoveStatement AS NVARCHAR(MAX)
 			SET @MoveStatement = ''
-			
+
 			SELECT @MoveStatement = @MoveStatement + 'MOVE ''' + LogicalName + ''' TO ''' + PhysicalName + ''','
 			FROM #filelist
-			
+
 			SELECT @MoveStatement MoveStatement
-			
-			SET @RestoreDatabaseCommand = @RestoreDatabaseCommand + 
+
+			SET @RestoreDatabaseCommand = @RestoreDatabaseCommand +
 			N'WITH #{withOptions}, ' +
 			@MoveStatement +
 			' REPLACE';
@@ -123,32 +153,13 @@ action :run do
 
 		SELECT @RestoreDatabaseCommand;
 
-		EXECUTE sp_executesql 
-		@RestoreDatabaseCommand, 
-		@RestoreDatabaseParams, 
-		@Path=@Path, 
+		EXECUTE sp_executesql
+		@RestoreDatabaseCommand,
+		@RestoreDatabaseParams,
+		@Path=@Path,
 		@LogicalDataName=@LogicalDataName,
 		@LogicalLogName=@LogicalLogName
-	EOH
-		
-	Chef::Log.debug("#{command}")
-	mssqlserver_sql_command 'restoredatabase' do
-		command "#{command}"
-		instance instance
-    timeout timeout
-		action :run
-	end
-end
-
-action :drop do
-  database = @new_resource.database
-  instance = @new_resource.instance
-  mssqlserver_sql_command "drop database #{database}" do
-    command "DROP DATABASE [#{database}]"
-    instance instance
-    database 'master'
-    action :run
-  end
+  EOH
 end
 
 private
