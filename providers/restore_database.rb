@@ -3,7 +3,7 @@ include Windows::Helper
 
 action :run do
   sql_command = create_script_contents
-	Chef::Log.debug("#{command}")
+	Chef::Log.debug("#{sql_command}")
 	mssqlserver_sql_command 'restoredatabase' do
 		command sql_command
 		instance instance
