@@ -1,4 +1,5 @@
 require 'tempfile'
+include Windows::Helper
 
 action :run do
   begin
@@ -35,7 +36,7 @@ end
 action :bat do
   shell_command = helper.create_shell_command(@new_resource.script)
   path = @new_resource.batch_path
-  file path do
+  file win_friendly_path(path) do
     content shell_command
   end
 end

@@ -1,5 +1,7 @@
 module MSSqlServerCookbook
   class SqlCmdHelper
+    include Windows::Helper
+
     def initialize(resource, node)
       @new_resource = resource
       @node = node
@@ -24,7 +26,7 @@ module MSSqlServerCookbook
         args['-S'] = @new_resource.instance
       end
 
-      args['-i'] = "\"#{script_path}\""
+      args['-i'] = "\"#{win_friendly_path(script_path)}\""
 
       cmdargs = args.map{|k,v| "#{k} #{v}"}.join(' ')
       Chef::Log.info("Args #{cmdargs}")
