@@ -16,7 +16,10 @@ action :drop do
   database = @new_resource.database
   instance = @new_resource.instance
   mssqlserver_sql_command "drop database #{database}" do
-    command "DROP DATABASE [#{database}]"
+    command "IF EXISTS(SELECT name FROM sys.databases WHERE name='#{database}')
+BEGIN
+	DROP DATABASE [#{database}]
+END"
     instance instance
     database 'master'
     action :run
