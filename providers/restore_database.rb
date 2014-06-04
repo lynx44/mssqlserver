@@ -175,6 +175,10 @@ def unzip(filepath)
 	end
 	
 	backuppath = filepath
+  if(::File.exist?(archivepath) && ::File.size(archivepath) == 0)
+    ::File.delete(archivepath)
+  end
+  
 	if filepath.start_with?("http")
 		remote_file archivepath do
 		  source filepath
