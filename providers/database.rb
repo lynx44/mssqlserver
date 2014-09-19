@@ -1,10 +1,14 @@
 action :create do
-  sql_command = "IF NOT EXISTS(SELECT Name FROM sys.databases WHERE Name='#{node['database']}') BEGIN CREATE DATABASE [#{node['database']}] END"
-  mssqlserver_sql_command "create #{node['database']} database" do
-    username node['username']
-    password node['password']
+  database = @new_resource.database
+  sql_command = "IF NOT EXISTS(SELECT Name FROM sys.databases WHERE Name='#{database}') BEGIN CREATE DATABASE [#{database}] END"
+  username = @new_resource.username
+  password = @new_resource.password
+  instance = @new_resource.instance
+  mssqlserver_sql_command "create #{database} database" do
+    username username
+    password password
     database 'master'
-    instance node['instance']
+    instance instance
     command sql_command
   end
 end
