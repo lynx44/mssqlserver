@@ -27,7 +27,6 @@ action :unzip do
 							::File.rename(path,backuppath)
 						end
 					}
-					Dir.rmdir(unzippedFileDirectory)
 				end
 			end
 		end
