@@ -1,4 +1,4 @@
-actions :run
+actions :run, :swap
 default_action :run
 
 attribute :source, :kind_of => String
