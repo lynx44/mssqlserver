@@ -104,7 +104,7 @@ def create_script_contents
 		IF(@DataDirectory != '')
 		BEGIN
       --map all files (including logs) to the data directory if specified
-			UPDATE #filelist SET PhysicalName = @DataDirectory + SUBSTRING(PhysicalName, LEN(PhysicalName) - CHARINDEX('\\', REVERSE(PhysicalName)) + 1, CHARINDEX('\\', REVERSE(PhysicalName)) + 1)
+			UPDATE #filelist SET PhysicalName = @DataDirectory + '\\' + (CASE WHEN Type='D' THEN @DatabaseName + (CASE WHEN CreateLSN > 0 THEN CONVERT(VARCHAR, CreateLSN + 1) ELSE '' END) + '.MDF' ELSE @DatabaseName + (CASE WHEN CreateLSN > 0 THEN CONVERT(VARCHAR, CreateLSN + 1) ELSE '' END) + '_Log.LDF' END)
 		END
 
     IF(@LogDirectory != '')
