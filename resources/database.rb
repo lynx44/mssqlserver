@@ -1,4 +1,4 @@
-actions :create
+actions :create, :drop
 default_action :create
 
 attribute :database, :kind_of => String #the name of the database
