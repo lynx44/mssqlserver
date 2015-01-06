@@ -13,6 +13,7 @@ action :unzip do
 		windows_zipfile unzippedFileDirectory do
 			 source filepath
 			 action :unzip
+			 overwrite true
 			 not_if {::File.exist?("#{backuppath}")}
 		end
 		
