@@ -9,12 +9,14 @@ action :unzip do
 		zippedFileName = "#{Pathname.new(filepath).basename}"
 		unzippedDirectoryName = zippedFileName.gsub('.zip', '')
 		unzippedFileDirectory = "#{cache_dir}/#{unzippedDirectoryName}"
-		
+
+
+		backup_path_exists = ::File.exist?(backuppath)
+		Chef::Log.info("#{backuppath} #{backup_path_exists ? 'already exists.' : "does not exist, will unzip #{filepath} to #{unzippedFileDirectory}"}")
 		windows_zipfile unzippedFileDirectory do
 			 source filepath
 			 action :unzip
-			 overwrite true
-			 not_if {::File.exist?("#{backuppath}")}
+			 not_if {backup_path_exists}
 		end
 		
 		ruby_block "rename file" do

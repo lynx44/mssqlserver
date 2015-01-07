@@ -176,19 +176,23 @@ def unzip(filepath)
 	
 	backuppath = filepath
   if(::File.exist?(archivepath) && ::File.size(archivepath) == 0)
+		Chef::Log.info("Archive exists at #{archivepath} but is empty (0 bytes). Will delete current file.")
     ::File.delete(archivepath)
   end
 
 	if filepath.start_with?("http")
+		file_exists = ::File.exist?(archivepath)
+		Chef::Log.info("#{archivepath} #{file_exists ? 'already exists' : "does not exist. Downloading from #{filepath}"}")
 		remote_file archivepath do
 		  source filepath
-		  not_if {::File.exist?(archivepath)}
+		  not_if {file_exists}
 		end
 	end
 	
 	if(archivepath.end_with?(".zip"))
 		backupname = "#{Pathname.new(filepath).basename}".gsub('zip', 'bak')
 		backuppath = "#{cache_dir}/#{backupname}"
+		Chef::Log.info("Unzipping #{archivepath} to #{backuppath}")
 		mssqlserver_unzip_database "unzip database" do
 			archive_path archivepath
 			backup_path backuppath
