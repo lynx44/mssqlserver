@@ -34,7 +34,7 @@ action :run do
 		Chef::Log.info("Args #{cmdargs}")
 		
 		Chef::Log.info("#{sqlpackage} #{cmdargs}")
-		windows_batch 'dacpac command' do
+		batch 'dacpac command' do
 		  code "\"#{sqlpackage}\" #{cmdargs}"
 		end
 	end
