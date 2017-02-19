@@ -21,10 +21,8 @@ action :run do
 					WHERE sys.databases.name=@DatabaseName AND type_desc='LOG'
 
 					EXEC(
-					'USE [' + @DatabaseName + ']
-					ALTER DATABASE [' + @DatabaseName + '] SET RECOVERY SIMPLE WITH NO_WAIT
-					DBCC SHRINKFILE(' + @LogName + ', 1)
-					ALTER DATABASE [' + @DatabaseName + '] SET RECOVERY FULL WITH NO_WAIT')
+					 'USE [' + @DatabaseName + ']
+          DBCC SHRINKFILE (N''' + @LogName + ''', 0, TRUNCATEONLY)')
 				END
 			EOH
 			instance instance
