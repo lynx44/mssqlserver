@@ -5,6 +5,6 @@ license          'All rights reserved'
 description      'Configures mssqlserver'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '0.2.1'
-depends			 'windows'
+depends      'windows', '1.36.1'
 depends      'powershell'
 depends      'windows_firewall'
